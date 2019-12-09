@@ -14,7 +14,7 @@ PRIMARY KEY (id)
 CREATE TABLE especie (
 id INT AUTO_INCREMENT,
 nombre_especie VARCHAR (30) NOT NULL,
-nombre_comun VARCHAR (30) NOT NULL,
+nombre_comun VARCHAR (30) NULL,
 nombre_ingles VARCHAR (30) NULL,
 PRIMARY KEY (id)
 );
@@ -27,15 +27,13 @@ PRIMARY KEY (id)
 
 CREATE TABLE documento (
 id INT(8) AUTO_INCREMENT,
-tipo_documento_id INT,
+tipo_documento_id INT NULL,
 revista VARCHAR(50) NULL,
 titulo VARCHAR(50) NOT NULL,
 autores VARCHAR(100) NULL,
 resumen VARCHAR(500) NULL,
 ano_publicacion INT(4) NOT NULL,
 ano INT(4) NULL,
-lugar VARCHAR(100) NULL,
-matriz VARCHAR(50) NULL,
 termino_general VARCHAR (30) NULL,
 descriptor VARCHAR (50) NULL,
 termino_especifico VARCHAR (50) NULL,
@@ -52,6 +50,8 @@ id INT(8) AUTO_INCREMENT,
 documento_id INT(8) NOT NULL,
 metal_id INT (8) NULL,
 pais_id INT NULL,
+lugar VARCHAR(100) NULL,
+matriz VARCHAR(50) NULL,
 especie_id INT(8) NOT NULL,
 longitud DECIMAL (11,8) DEFAULT NULL,
 latitud DECIMAL (11,8) DEFAULT NULL,
