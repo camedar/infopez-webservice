@@ -74,13 +74,17 @@ class Webservice extends MX_Controller {
 			if(sizeof($buscarEspecie) > 0){
 				$idEspecie = $buscarEspecie[0]['id'];
 			} else {
-				$idEspecie = $this->Especie->insertar(
-					array(
-						"nombre_especie" => $fila['N'],
-						"nombre_comun" => $fila['O'],
-						"nombre_ingles" => $fila['P'],
-					)
-				);
+				if($fila['N'] != "") {
+					$idEspecie = $this->Especie->insertar(
+						array(
+							"nombre_especie" => $fila['N'],
+							"nombre_comun" => $fila['O'],
+							"nombre_ingles" => $fila['P'],
+						)
+					);
+				} else {
+					$idEspecie = null;
+				}
 			}
 
 			// Genera id de la tabla pais
