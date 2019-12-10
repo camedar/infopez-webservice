@@ -50,6 +50,7 @@ class Webservice extends MX_Controller {
 		$sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 		$i = 0;
 		$titulos = true;
+		$idDoc= "";
 		foreach ($sheetData as $key => $fila) {
 			if($titulos){
 				$titulos = false;
@@ -99,26 +100,29 @@ class Webservice extends MX_Controller {
 				);
 			}
 
-			// insertar en table documento
-			$datos = array();
-			$datos['tipo_documento_id'] = $tipoDocumentoId;
-			$datos['revista'] = $fila['C'];
-			$datos['titulo']  = $fila['D'];
-			$datos['autores'] = $fila['E'];
-			$datos['resumen'] = $fila['F'];
-			$datos['ano_publicacion'] = $fila['G'];
-			$datos['ano'] = $fila['I'];
-			$datos['termino_general'] = $fila['U'];
-			$datos['descriptor'] = $fila['V'];
-			$datos['termino_especifico'] = $fila['W'];
-			$datos['palabra_clave'] = $fila['X'];
-			$datos['link'] = $fila['Y'];
+			if($idDoc != $fila['A']){
+				$idDoc = $fila['A'];
+				// insertar en table documento
+				$datos = array();
+				$datos['tipo_documento_id'] = $tipoDocumentoId;
+				$datos['revista'] = $fila['C'];
+				$datos['titulo']  = $fila['D'];
+				$datos['autores'] = $fila['E'];
+				$datos['resumen'] = $fila['F'];
+				$datos['ano_publicacion'] = $fila['G'];
+				$datos['ano'] = ($fila['I']);
+				$datos['termino_general'] = $fila['U'];
+				$datos['descriptor'] = $fila['V'];
+				$datos['termino_especifico'] = $fila['W'];
+				$datos['palabra_clave'] = $fila['X'];
+				$datos['link'] = $fila['Y'];
 
-			$documento_id = $this->Documento->insertar( $datos);
+				$documento_id = $this->Documento->insertar( $datos);
+			}
 
 			$datos = array();
-			$longitud = $this->convertirCoordenadas($fila['L']);
-			$latitud = $this->convertirCoordenadas($fila['K']);
+			$longitud = $this->convertirCoordenadas(utf8_encode($fila['L']));
+			$latitud = $this->convertirCoordenadas(utf8_encode($fila['K']));
 			$datos['documento_id'] = $documento_id;
 			$datos['metal_id'] = $idMetal;
 			$datos['pais_id'] = $idPais;
@@ -127,13 +131,36 @@ class Webservice extends MX_Controller {
 			$datos['especie_id'] = $idEspecie;
 			$datos['longitud'] = $longitud;
 			$datos['latitud'] = $latitud;
-			$datos['minimo'] = $fila['R'];
-			$datos['maximo'] = $fila['S'];
-			$datos['unidad'] = $fila['T'];
+			$datos['minimo'] = utf8_encode($fila['R']);
+			$datos['maximo'] = utf8_encode($fila['S']);
+			$datos['unidad'] = utf8_encode($fila['T']);
 
 			$documentoConcentracionMetalID = $this->DocumentoConcentracionMetal->insertar( $datos);
 		}
+    }
 
-		
+    /**
+     * /tesauro/termino_general/[letra_inicio_palabra]
+     * /tesauro/descriptor/[termino_general]
+  	 * 
+     */
+    public function tesauro() {
+    	$this->load->model("Documento");
+		$servicio = $this->uri->segment(3);
+
+    	if($servicio === "termino_general") {
+    		$letraInicio = $this->uri->segment(4);
+    		$letraInicio = $letraInicio!=""?array($letraInicio):null;
+    		$terminosGeneralesArr = $this->Documento->listarTerminoGeneral( null, $letraInicio);
+    		echo json_encode($terminosGeneralesArr);
+    	} else if($servicio === "descriptor") {
+    		$filtro = $this->uri->segment(4);
+    		$terminosGeneralesArr = $this->Documento->obtenerDescriptorDeTermGeneral($filtro);
+    		echo json_encode($terminosGeneralesArr);
+    	} else if($servicio === "documento") {
+    		$filtro = $this->uri->segment(4);
+    		$terminosGeneralesArr = $this->Documento->obtenerDocsDeTermGeneral($filtro);
+    		echo json_encode($terminosGeneralesArr);
+    	}
     }
 } 
