@@ -163,7 +163,7 @@ class Webservice extends MX_Controller {
     		echo json_encode($terminosGeneralesArr);
     	} else if($servicio === "documento") {
     		$filtro = $this->uri->segment(4);
-    		$terminosGeneralesArr = $this->Documento->obtenerDocsDeTermGeneral($filtro);
+    		$terminosGeneralesArr = $this->Documento->obtenerDocsDeDescriptor($filtro);
     		echo json_encode($terminosGeneralesArr);
     	}
     }

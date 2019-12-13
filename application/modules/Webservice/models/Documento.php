@@ -44,4 +44,11 @@ class Documento extends CI_Model {
 
 		return $result->result_array();
 	}
+
+	public function obtenerDocsDeDescriptor( $descriptor ) {
+		$sql = "SELECT titulo FROM " . $this->nombreTabla . " WHERE descriptor = '" . $descriptor . "'";
+		$result = $this->db->query($sql);
+
+		return $result->result_array();
+	}
 }
