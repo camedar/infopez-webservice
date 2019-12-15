@@ -4,6 +4,12 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Documento extends CI_Model {
 	private $nombreTabla = "documento";
 
+	public function convertirCharsDeURL($str) {
+		$buscar = array("%2C");
+		$remplazar = array(",");
+		return str_replace( $buscar, $remplazar, $str); 
+	}
+
 	public function __construct(){
 		parent::__construct();
 		$this->load->database();
@@ -31,7 +37,8 @@ class Documento extends CI_Model {
 	}
 
 	public function obtenerDescriptorDeTermGeneral( $termGeneral ) {
-		$sql = "SELECT descriptor FROM " . $this->nombreTabla . " WHERE termino_general = '" . $termGeneral . "'";
+		$termGeneral_ = $this->convertirCharsDeURL( $termGeneral);
+		$sql = "SELECT DISTINCT descriptor FROM " . $this->nombreTabla . " WHERE termino_general LIKE '" . $termGeneral_ . "' ORDER BY descriptor";
 
 		$result = $this->db->query($sql);
 
@@ -39,14 +46,16 @@ class Documento extends CI_Model {
 	}
 
 	public function obtenerDocsDeTermGeneral( $termGeneral ) {
-		$sql = "SELECT titulo FROM " . $this->nombreTabla . " WHERE termino_general = '" . $termGeneral . "'";
+		$termGeneral_ = $this->convertirCharsDeURL( $termGeneral);
+		$sql = "SELECT titulo FROM " . $this->nombreTabla . " WHERE termino_general LIKE '" . $termGeneral_ . "' ORDER BY titulo";
 		$result = $this->db->query($sql);
 
 		return $result->result_array();
 	}
 
 	public function obtenerDocsDeDescriptor( $descriptor ) {
-		$sql = "SELECT titulo FROM " . $this->nombreTabla . " WHERE descriptor = '" . $descriptor . "'";
+		$descriptor_ = $this->convertirCharsDeURL( $descriptor);
+		$sql = "SELECT titulo,link FROM " . $this->nombreTabla . " WHERE descriptor LIKE '" . $descriptor_ . "' ORDER BY titulo";
 		$result = $this->db->query($sql);
 
 		return $result->result_array();
