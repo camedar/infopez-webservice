@@ -1,3 +1,11 @@
+CREATE TABLE metal_dosis_ref_oral(
+id INT AUTO_INCREMENT,
+nombre_metal VARCHAR(30) NULL,
+simbolo_metal VARCHAR(2) NOT NULL,
+RFD decimal(7,6) NOT NULL,
+PRIMARY KEY(id)
+);
+
 CREATE TABLE tipo_documento (
 id INT(3) AUTO_INCREMENT,
 nombre VARCHAR(50) NOT NULL,
@@ -78,6 +86,16 @@ fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (id)
 );
 
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Cadmio','Cd',0.001);
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Cobre','Cu',0.04);
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Cromo','Cr',1.5);
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Mercurio','Hg',0.00016);
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Niquel','Ni',0.02);
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Plata','Ag',0.005);
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Plomo','Pb',0.00014);
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Selenio','Se',0.005);
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Talio','Tl',0.000003);
+INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Zinc','Zn',0.3);
 
 INSERT INTO tipo_documento (nombre) VALUES ('Artículo científico');
 INSERT INTO tipo_documento (nombre) VALUES ('Documento técnico');

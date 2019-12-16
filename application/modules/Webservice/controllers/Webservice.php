@@ -167,4 +167,34 @@ class Webservice extends MX_Controller {
     		echo json_encode($terminosGeneralesArr);
     	}
     }
+
+    public function calculadora() {
+    	$this->load->model("MetalDosisRefOral");
+    	$servicio = $this->uri->segment(3);
+    	if($servicio === "traer_metales_dosis_ref_oral") {
+    		$metalesDosisRefOral = $this->MetalDosisRefOral->listarMetalesDosis();
+    		echo json_encode($metalesDosisRefOral);
+    	} else if($servicio === "hacer_calculo") {
+    		$id = 1;
+    		
+    		$requestData = json_decode(file_get_contents('php://input'), true);
+    		$peso = $requestData['peso'];
+    		$edad = $requestData['edad'];
+    		$frecuencia = $requestData['frecuencia'];
+    		$consumo = $requestData['consumo'];
+    		$metalId = $requestData['metal'];
+    		$metalesDosisRefOral = "";
+    		if($metalId){
+    			$metalesDosisRefOral = $this->MetalDosisRefOral->consultarMetalDosis($metalId);
+    			$EF = 52.143 * $frecuencia;
+    			$ED = $edad;
+    			$FIR = $consumo / 1000;
+    			$RFD = $metalesDosisRefOral['RFD'];
+    			$BW = $peso;
+    			$AT = $EF * $ED;
+    		}
+
+    		echo json_encode("1089");
+    	}
+    }
 } 
