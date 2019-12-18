@@ -14,7 +14,7 @@ PRIMARY KEY (id)
 
 CREATE TABLE pais (
 id INT(3) AUTO_INCREMENT,
-nombre VARCHAR (30) NOT NULL,
+nombre VARCHAR (100) NOT NULL,
 codigo VARCHAR(2) NOT NULL,
 PRIMARY KEY (id)
 );
@@ -37,7 +37,7 @@ CREATE TABLE documento (
 id INT(8) AUTO_INCREMENT,
 tipo_documento_id INT NULL,
 revista VARCHAR(50) NULL,
-titulo VARCHAR(50) NOT NULL,
+titulo VARCHAR(100) NOT NULL,
 autores VARCHAR(100) NULL,
 resumen VARCHAR(500) NULL,
 ano_publicacion VARCHAR(20) NOT NULL,
