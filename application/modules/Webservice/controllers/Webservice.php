@@ -18,20 +18,18 @@ class Webservice extends MX_Controller {
     		$texto);
     }
 
-    public function convertirCoordenadas($texto) {
+    public function convertirCoordenadas($CoordArr) {
     	$negativo = false;
-    	// 10°21'54''N
-    	// 75°06'58"O
-    	// 75°35′57″O
-    	$texto_ = str_replace( array("''",'"', '″'), ":",$texto);
-    	$texto_ = str_replace( array("°","'"), ":", $texto_);
-    	$coordenadaselemsArr = explode( ":", $texto_);
-    	
-    	if($coordenadaselemsArr[3] == 'O' || $coordenadaselemsArr[3] == 'S') {
+    	$grados = floatval($CoordArr[0]);
+    	$minutos = floatval($CoordArr[1]);
+    	$segundos = floatval($CoordArr[2]);
+    	$sentido = $CoordArr[3];
+
+    	if($sentido == 'O' || $sentido == 'S') {
     		$negativo = true;
     	}
 
-    	$coordenadaReal = ( ( ( floatval($coordenadaselemsArr[2]) / 60 ) + floatval($coordenadaselemsArr[1]) ) / 60 ) + floatval($coordenadaselemsArr[0]);
+    	$coordenadaReal = ( ( ( $segundos / 60 ) + $minutos ) / 60 ) + $grados;
 
     	if($negativo){
     		$coordenadaReal *= -1;
@@ -57,29 +55,32 @@ class Webservice extends MX_Controller {
 				continue;
 			}
 			// Genera Id de la tabla metal
-			$buscarMetal = $this->Metal->obtenerId($fila['Q']);
+			$buscarMetal = $this->Metal->obtenerId($fila['W']);
 			$idMetal = 0;
 			if(sizeof($buscarMetal) > 0){
 				$idMetal = $buscarMetal[0]['id'];
 			} else {
 				$idMetal = $this->Metal->insertar(
 					array(
-						"nombre" => $fila['Q']
+						"nombre" => $fila['W']
 					)
 				);
 			}
 			// Genera id de la tabla especie
-			$buscarEspecie = $this->Especie->obtenerId($fila['N']);
+			$buscarEspecie = $this->Especie->obtenerId($fila['T']);
 			$idEspecie = 0;
 			if(sizeof($buscarEspecie) > 0){
 				$idEspecie = $buscarEspecie[0]['id'];
 			} else {
-				if($fila['N'] != "") {
+				if($fila['T'] != "") {
 					$idEspecie = $this->Especie->insertar(
 						array(
-							"nombre_especie" => $fila['N'],
-							"nombre_comun" => $fila['O'],
-							"nombre_ingles" => $fila['P'],
+							"nombre_especie" => $fila['T'],
+							"nombre_comun" => $fila['U'],
+							"nombre_ingles" => $fila['V'],
+							"minimo" => utf8_encode($fila['X']),
+							"maximo" => utf8_encode($fila['Y']),
+							"unidad" => utf8_encode($fila['Z']),
 						)
 					);
 				} else {
@@ -115,29 +116,31 @@ class Webservice extends MX_Controller {
 				$datos['resumen'] = $fila['F'];
 				$datos['ano_publicacion'] = $fila['G'];
 				$datos['ano'] = ($fila['I']);
-				$datos['termino_general'] = $fila['U'];
-				$datos['descriptor'] = $fila['V'];
-				$datos['termino_especifico'] = $fila['W'];
-				$datos['palabra_clave'] = $fila['X'];
-				$datos['link'] = $fila['Y'];
+				$datos['termino_general'] = $fila['AA'];
+				$datos['descriptor'] = $fila['AB'];
+				$datos['termino_especifico'] = $fila['AC'];
+				$datos['palabra_clave'] = $fila['AD'];
+				$datos['link'] = $fila['AE'];
+				$datos['referencia'] = $fila['AF'];
 
 				$documento_id = $this->Documento->insertar( $datos);
 			}
 
 			$datos = array();
-			$longitud = $this->convertirCoordenadas(utf8_encode($fila['L']));
-			$latitud = $this->convertirCoordenadas(utf8_encode($fila['K']));
+			$longitud = $this->convertirCoordenadas(
+				array( $fila['K'], $fila['L'], $fila['M'], $fila['N'])
+			);
+			$latitud = $this->convertirCoordenadas(
+				array( $fila['O'], $fila['P'], $fila['Q'], $fila['R'])
+			);
 			$datos['documento_id'] = $documento_id;
 			$datos['metal_id'] = $idMetal;
 			$datos['pais_id'] = $idPais;
 			$datos['lugar'] = $fila['J'];
-			$datos['matriz'] = $fila['M'];
+			$datos['matriz'] = $fila['S'];
 			$datos['especie_id'] = $idEspecie;
 			$datos['longitud'] = $longitud;
 			$datos['latitud'] = $latitud;
-			$datos['minimo'] = utf8_encode($fila['R']);
-			$datos['maximo'] = utf8_encode($fila['S']);
-			$datos['unidad'] = utf8_encode($fila['T']);
 
 			$documentoConcentracionMetalID = $this->DocumentoConcentracionMetal->insertar( $datos);
 		}

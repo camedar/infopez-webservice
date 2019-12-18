@@ -9,7 +9,7 @@ class Pais extends CI_Model {
 	}
 
 	public function obtenerId( $nombre){
-		$this->db->like( "nombre", strtolower($nombre));
+		$this->db->where( "nombre", strtolower($nombre));
 		$query = $this->db->get($this->nombreTabla);
 		return $query->result_array();
 	}

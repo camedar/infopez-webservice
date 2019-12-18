@@ -14,7 +14,7 @@ class Metal extends CI_Model {
 	}
 
 	public function obtenerId( $nombre){
-		$sql = "SELECT id FROM " . $this->nombreTabla . " WHERE nombre LIKE '" . $nombre . "'";
+		$sql = "SELECT id FROM " . $this->nombreTabla . " WHERE nombre = '" . $nombre . "'";
 		$query = $this->db->query($sql);
 		//var_dump($query);
 		//return $query->result();
