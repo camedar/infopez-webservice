@@ -21,7 +21,7 @@ class Metaldosisreforal extends CI_Model {
 	}
 
 	public function listarMetalesDosis() {
-		$sql = "SELECT id,nombre_metal, simbolo_metal, RFD FROM " . $this->nombreTabla . " " . " ORDER BY nombre_metal ASC";
+		$sql = "SELECT id,nombre_metal, simbolo_metal, RFD FROM " . $this->nombreTabla . " ORDER BY nombre_metal ASC";
 		$result = $this->db->query($sql);
 
 		return $result->result_array();

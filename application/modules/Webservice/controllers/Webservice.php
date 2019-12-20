@@ -172,7 +172,7 @@ class Webservice extends MX_Controller {
     }
 
     public function calculadora() {
-    	$this->load->model("MetalDosisRefOral");
+    	$this->load->model( array("MetalDosisRefOral", "Especie") );
     	$servicio = $this->uri->segment(3);
     	if($servicio === "traer_metales_dosis_ref_oral") {
     		$metalesDosisRefOral = $this->MetalDosisRefOral->listarMetalesDosis();
@@ -181,23 +181,36 @@ class Webservice extends MX_Controller {
     		$id = 1;
     		
     		$requestData = json_decode(file_get_contents('php://input'), true);
+    		$especieId = $requestData['especie_id'];
     		$peso = $requestData['peso'];
     		$edad = $requestData['edad'];
     		$frecuencia = $requestData['frecuencia'];
     		$consumo = $requestData['consumo'];
     		$metalId = $requestData['metal'];
     		$metalesDosisRefOral = "";
+
+    		$THQ = "-";
     		if($metalId){
     			$metalesDosisRefOral = $this->MetalDosisRefOral->consultarMetalDosis($metalId);
+    			$concentracionMaxima = $this->Especie->obtenerEspecieConId( $especieId, array("maximo"));
     			$EF = 52.143 * $frecuencia;
     			$ED = $edad;
     			$FIR = $consumo / 1000;
-    			$RFD = $metalesDosisRefOral['RFD'];
+    			$MC = $concentracionMaxima[0]['maximo'];
+    			$RFD = $metalesDosisRefOral[0]['RFD'];
     			$BW = $peso;
     			$AT = $EF * $ED;
+
+    			$THQ = ( ($EF * $ED * $FIR * $MC) / ($RFD * $BW * $AT) ) * (0.01);
     		}
 
-    		echo json_encode("1089");
+    		echo json_encode($THQ);
+    	} else if($servicio === "especies") {
+    		$this->load->model("Especie");
+    		$iniciales = $this->uri->segment(4);
+    		$coincidencias = $this->Especie->especiesAutoCompletar( $iniciales);
+
+    		echo json_encode($coincidencias);
     	}
     }
 } 
