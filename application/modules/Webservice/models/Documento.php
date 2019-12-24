@@ -5,8 +5,8 @@ class Documento extends CI_Model {
 	private $nombreTabla = "documento";
 
 	public function convertirCharsDeURL($str) {
-		$buscar = array("%2C");
-		$remplazar = array(",");
+		$buscar = array("%2C","%20","%24");
+		$remplazar = array(",", "%","%");
 		return str_replace( $buscar, $remplazar, $str); 
 	}
 
@@ -25,7 +25,7 @@ class Documento extends CI_Model {
 		if(is_array( $letraInicialArr) && sizeof($letraInicialArr)) {
 			$where = " WHERE ";
 			foreach ($letraInicialArr as $key => $value) {
-				$where .= "LOWER(termino_general) LIKE '" . $value . "%' OR ";
+				$where .= "LOWER(termino_general) LIKE '" . strtolower($value) . "%' OR ";
 			}
 			$where = substr( $where, 0, strlen($where) - 4);
 		}
