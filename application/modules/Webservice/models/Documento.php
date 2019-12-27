@@ -60,4 +60,11 @@ class Documento extends CI_Model {
 
 		return $result->result_array();
 	}
+
+	public function obtenerInfoDocsMapa(){
+		$sql = "SELECT d.titulo,d.palabra_clave,dcm.latitud,dcm.longitud,dcm.lugar,td.nombre,e.nombre_comun,e.nombre_especie, d.link FROM documento d INNER JOIN tipo_documento td ON d.tipo_documento_id=td.id INNER JOIN documento_concentracion_metal dcm ON d.id=dcm.documento_id INNER JOIN especie e ON dcm.especie_id=e.id GROUP BY dcm.latitud,dcm.longitud";
+		$result = $this->db->query($sql);
+
+		return $result->result_array();
+	}
 }

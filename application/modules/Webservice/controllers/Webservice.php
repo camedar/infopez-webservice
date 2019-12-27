@@ -127,10 +127,10 @@ class Webservice extends MX_Controller {
 			}
 
 			$datos = array();
-			$longitud = $this->convertirCoordenadas(
+			$latitud = $this->convertirCoordenadas(
 				array( $fila['K'], $fila['L'], $fila['M'], $fila['N'])
 			);
-			$latitud = $this->convertirCoordenadas(
+			$longitud = $this->convertirCoordenadas(
 				array( $fila['O'], $fila['P'], $fila['Q'], $fila['R'])
 			);
 			$datos['documento_id'] = $documento_id;
@@ -211,6 +211,16 @@ class Webservice extends MX_Controller {
     		$coincidencias = $this->Especie->especiesAutoCompletar( $iniciales);
 
     		echo json_encode($coincidencias);
+    	}
+    }
+
+    public function mapa(){
+    	$servicio = $this->uri->segment(3);
+    	$this->load->model("documento");
+
+    	if($servicio === "traer_docs_coord") {
+    		$puntosInfo = $this->documento->obtenerInfoDocsMapa();
+    		echo json_encode($puntosInfo);
     	}
     }
 } 
