@@ -40,11 +40,23 @@ class Webservice extends MX_Controller {
     }
 
     public function carga_archivo() {
+    	error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
     	$this->load->model(array("Documento", "TipoDocumento", "DocumentoConcentracionMetal", "Pais", "Especie", "Metal"));
-    	$nombre_archivo = $this->uri->segment(3);
-        $inputFileName = 'assets/documentos/' . $nombre_archivo;
-		//$helper->log('Loading file ' . pathinfo($inputFileName, PATHINFO_BASENAME) . ' using IOFactory to identify the format');
-		$spreadsheet = IOFactory::load($inputFileName);
+    	$rutaDir = "assets/documentos/";
+    	$archivo = $_FILES['file']['name'];
+    	$mimeType = mime_content_type($_FILES['file']['tmp_name']);
+    	$ext = pathinfo( $archivo, PATHINFO_EXTENSION);
+    	$nombrArchivoStr = date('YmdHis') . "." . $ext;
+    	$archivoRuta = $rutaDir . $nombrArchivoStr;//basename( $archivo);
+//    	if($mimeType !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" && $mimeType !== "application/vnd.ms-excel") {
+//    		die( json_encode(array( "tipo" => "error", "mensaje" => "Tipo de documento no soportado $mimeType!")) );
+//    	}
+    	if(!move_uploaded_file( $_FILES['file']['tmp_name'], $archivoRuta)) {
+    		die ( json_encode(array( "tipo" => "error", "mensaje" => "No se pudo subir el archivo correctamente!")) );
+    	}
+
+		//$helper->log('Loading file ' . pathinfo($archivoRuta, PATHINFO_BASENAME) . ' using IOFactory to identify the format');
+		$spreadsheet = IOFactory::load($archivoRuta);
 		$sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 		$i = 0;
 		$titulos = true;
@@ -144,6 +156,8 @@ class Webservice extends MX_Controller {
 
 			$documentoConcentracionMetalID = $this->DocumentoConcentracionMetal->insertar( $datos);
 		}
+
+		echo json_encode(array( "tipo" => "info", "mensaje" => "El archivo fue cargado correctamente!"));
     }
 
     /**
