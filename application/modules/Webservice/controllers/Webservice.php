@@ -61,6 +61,48 @@ class Webservice extends MX_Controller {
 		$i = 0;
 		$titulos = true;
 		$idDoc= "";
+
+		$verificacionTitulos = array(
+			"Registro",
+		    "Tipo de documento",
+		    "Revista",
+		    "Titulo",
+		    "Autores",
+		    "Resumen",
+		    "Año (Publicación)",
+		    "Pais",
+		    "Año",
+		    "Lugar",
+		    "Grados (Latitud)",
+		    "Minutos (Latitud)",
+		    "Segundos (Latitud)",
+		    "Orientación (Latitud)",
+		    "Grados (Longitud)",
+		    "Minutos (Longitud)",
+		    "Segundos(Longitud)",
+		    "Orientación (Longitud)",
+		    "Matriz",
+		    "Especie",
+		    "Nombre comun",
+		    "Nombre inglés",
+		    "Metal ",
+		    "Concentración Mínima",
+		    "Concentración Máxima",
+		    "Unidades de concentración",
+		    "Termino General",
+		    "Descriptores",
+		    "Termino Específico",
+		    "Palabra Clave ",
+		    "Link",
+		    "Referencia"
+		);
+
+		$columnasFaltantes = array_diff( $verificacionTitulos, $sheetData[1]);
+		$columnasSobrantes = array_diff( $sheetData[1], $verificacionTitulos);
+		if(sizeof($columnasSobrantes) > 0 || sizeof($columnasFaltantes) > 0){
+			die ( json_encode(array( "tipo" => "error", "mensaje" => "El estructura del archivo no es válida, verifique número de columnas y títulos!")) );
+		}
+
 		foreach ($sheetData as $key => $fila) {
 			if($titulos){
 				$titulos = false;
@@ -157,7 +199,7 @@ class Webservice extends MX_Controller {
 			$documentoConcentracionMetalID = $this->DocumentoConcentracionMetal->insertar( $datos);
 		}
 
-		echo json_encode(array( "tipo" => "info", "mensaje" => "El archivo fue cargado correctamente!"));
+		echo json_encode(array( "tipo" => "info", "mensaje" => "El archivo $archivo fue cargado correctamente!"));
     }
 
     /**
