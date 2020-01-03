@@ -5,10 +5,16 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class Webservice extends MX_Controller {
 
+	var $nroRegistrosPorPagina = 20;
+
     function __construct() {
         parent::__construct();
         $this->load->helper('path');
         $this->load->helper('url');
+    }
+
+    public function obtenerIdxPrimerRegistro($pagina){
+    	return ($pagina-1) * $this->nroRegistrosPorPagina;
     }
 
     public function remplazarCharEspeciales($texto) {
@@ -285,10 +291,20 @@ class Webservice extends MX_Controller {
     	$this->load->model("Especie");
 
     	if( $servicio === "traer_especies"){
-    		$filtro = $this->uri->segment(4);
-    		$especiesArr = $this->Especie->obtenerEspecies($filtro);
+    		$pagina = $this->uri->segment(4);
+    		$filtro = $this->uri->segment(5);
 
-    		echo json_encode( $especiesArr);
+    		$especiesArr = $this->Especie->obtenerEspecies( $filtro, $this->obtenerIdxPrimerRegistro($pagina));
+    		$nroEspcies = $this->Especie->contarEspecies();
+
+    		echo json_encode( 
+    			array(
+    				"total_registros" => intval($nroEspcies[0]['nro_especies']),
+    				"registros_por_pagina" => $this->nroRegistrosPorPagina,
+    				"pagina" => intval($pagina),
+    				"especies" => $especiesArr
+    			)
+    		);
 
     	}
     }
