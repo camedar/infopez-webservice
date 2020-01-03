@@ -46,4 +46,11 @@ class Especie extends CI_Model {
 		}
 		return null;
 	}
+
+	public function obtenerEspecies($nombreEspecie){
+		$sql = "SELECT id, nombre_especie, nombre_comun FROM " . $this->nombreTabla . " WHERE nombre_especie LIKE '%" . $nombreEspecie . "%' ORDER BY nombre_especie";
+		$query = $this->db->query( $sql);
+
+		return $query->result_array();
+	}
 }

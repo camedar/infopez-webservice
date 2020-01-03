@@ -279,4 +279,17 @@ class Webservice extends MX_Controller {
     		echo json_encode($puntosInfo);
     	}
     }
+
+    public function especies() {
+    	$servicio = $this->uri->segment(3);
+    	$this->load->model("Especie");
+
+    	if( $servicio === "traer_especies"){
+    		$filtro = $this->uri->segment(4);
+    		$especiesArr = $this->Especie->obtenerEspecies($filtro);
+
+    		echo json_encode( $especiesArr);
+
+    	}
+    }
 } 
