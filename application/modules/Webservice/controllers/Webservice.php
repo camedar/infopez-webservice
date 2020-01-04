@@ -331,4 +331,27 @@ class Webservice extends MX_Controller {
 
     	}
     }
+
+    public function metaldosisreforal() {
+    	$servicio = $this->uri->segment(3);
+    	$this->load->model("MetalDosisRefOral");
+
+    	if( $servicio === "traer_metales"){
+    		$pagina = $this->uri->segment(4);
+    		$filtro = $this->uri->segment(5);
+
+    		$metalesArr = $this->MetalDosisRefOral->obtenerMetalesDosis( $filtro, $this->obtenerIdxPrimerRegistro($pagina), $this->nroRegistrosPorPagina);
+    		$nroMetales = $this->MetalDosisRefOral->contarMetalesDosis();
+
+    		echo json_encode( 
+    			array(
+    				"total_registros" => intval($nroMetales[0]['nro_metales']),
+    				"registros_por_pagina" => $this->nroRegistrosPorPagina,
+    				"pagina" => intval($pagina),
+    				"metales" => $metalesArr
+    			)
+    		);
+
+    	}
+    }
 } 

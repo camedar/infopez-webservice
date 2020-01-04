@@ -33,4 +33,18 @@ class Metaldosisreforal extends CI_Model {
 
 		return $result->result_array();
 	}
+
+	public function obtenerMetalesDosis($nombre,$idxPrimerRegistro, $limite){
+		$sql = "SELECT id,nombre_metal, simbolo_metal, RFD FROM " . $this->nombreTabla . " WHERE nombre_metal LIKE '%" . $nombre . "%' ORDER BY nombre_metal LIMIT " . $idxPrimerRegistro . "," . $limite;
+		$query = $this->db->query( $sql);
+
+		return $query->result_array();
+	}
+
+	public function contarMetalesDosis(){
+		$sql = "SELECT COUNT(1) AS nro_metales FROM " . $this->nombreTabla;
+		$query = $this->db->query($sql);
+
+		return $query->result_array();
+	}
 }
