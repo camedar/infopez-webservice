@@ -294,7 +294,7 @@ class Webservice extends MX_Controller {
     		$pagina = $this->uri->segment(4);
     		$filtro = $this->uri->segment(5);
 
-    		$especiesArr = $this->Especie->obtenerEspecies( $filtro, $this->obtenerIdxPrimerRegistro($pagina));
+    		$especiesArr = $this->Especie->obtenerEspecies( $filtro, $this->obtenerIdxPrimerRegistro($pagina), $this->nroRegistrosPorPagina);
     		$nroEspcies = $this->Especie->contarEspecies();
 
     		echo json_encode( 
@@ -303,6 +303,29 @@ class Webservice extends MX_Controller {
     				"registros_por_pagina" => $this->nroRegistrosPorPagina,
     				"pagina" => intval($pagina),
     				"especies" => $especiesArr
+    			)
+    		);
+
+    	}
+    }
+
+    public function metales() {
+    	$servicio = $this->uri->segment(3);
+    	$this->load->model("Metal");
+
+    	if( $servicio === "traer_metales"){
+    		$pagina = $this->uri->segment(4);
+    		$filtro = $this->uri->segment(5);
+
+    		$metalesArr = $this->Metal->obtenerMetales( $filtro, $this->obtenerIdxPrimerRegistro($pagina), $this->nroRegistrosPorPagina);
+    		$nroMetales = $this->Metal->contarMetales();
+
+    		echo json_encode( 
+    			array(
+    				"total_registros" => intval($nroMetales[0]['nro_metales']),
+    				"registros_por_pagina" => $this->nroRegistrosPorPagina,
+    				"pagina" => intval($pagina),
+    				"metales" => $metalesArr
     			)
     		);
 

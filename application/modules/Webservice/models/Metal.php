@@ -20,4 +20,20 @@ class Metal extends CI_Model {
 		//return $query->result();
 		return $query->result_array();
 	}
+
+	public function obtenerMetales($nombre,$idxPrimerRegistro, $limite){
+		$sql = "SELECT id, nombre FROM " . $this->nombreTabla . " WHERE nombre LIKE '%" . $nombre . "%' ORDER BY nombre LIMIT " . $idxPrimerRegistro . "," . $limite;
+		$query = $this->db->query( $sql);
+
+		return $query->result_array();
+	}
+
+	public function contarMetales(){
+		$sql = "SELECT COUNT(1) AS nro_metales FROM " . $this->nombreTabla;
+		$query = $this->db->query($sql);
+
+		return $query->result_array();
+	}
+
+
 }
