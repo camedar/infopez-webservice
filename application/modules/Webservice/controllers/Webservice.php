@@ -354,4 +354,27 @@ class Webservice extends MX_Controller {
 
     	}
     }
+
+    public function documento() {
+    	$servicio = $this->uri->segment(3);
+    	$this->load->model("Documento");
+
+    	if( $servicio === "traer_documentos"){
+    		$pagina = $this->uri->segment(4);
+    		$filtro = $this->uri->segment(5);
+
+    		$documentosArr = $this->Documento->obtenerDocumentos( $filtro, $this->obtenerIdxPrimerRegistro($pagina), $this->nroRegistrosPorPagina);
+    		$nroDocumentos = $this->Documento->contarDocumentos();
+
+    		echo json_encode(
+    			array(
+    				"total_registros" => intval( $nroDocumentos[0]['nro_documentos']),
+    				"registros_por_pagina" => $this->nroRegistrosPorPagina,
+    				"pagina" => intval( $pagina),
+    				"documentos" => $documentosArr
+    			)
+    		);
+
+    	}
+    }
 } 

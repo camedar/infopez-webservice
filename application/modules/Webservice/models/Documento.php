@@ -67,4 +67,22 @@ class Documento extends CI_Model {
 
 		return $result->result_array();
 	}
+
+	public function obtenerDocumentos($nombreEspecie,$idxPrimerRegistro,$limite){
+		$sql = "SELECT d.id, d.revista, d.titulo, d.autores, d.resumen, d.ano_publicacion, d.ano, d.termino_general, d.descriptor, d.termino_especifico, d.palabra_clave, d.link, d.referencia,
+			t.nombre AS tipo_documento FROM " . $this->nombreTabla . " d";
+		$sql .= " INNER JOIN tipo_documento t ON d.tipo_documento_id = t.id";
+		$sql .= " WHERE d.titulo LIKE '%" . $nombreEspecie . "%'";
+		$sql .= " ORDER BY d.titulo LIMIT " . $idxPrimerRegistro . "," . $limite;
+		$query = $this->db->query( $sql);
+
+		return $query->result_array();
+	}
+
+	public function contarDocumentos(){
+		$sql = "SELECT COUNT(1) AS nro_documentos FROM " . $this->nombreTabla;
+		$query = $this->db->query($sql);
+
+		return $query->result_array();
+	}
 }
