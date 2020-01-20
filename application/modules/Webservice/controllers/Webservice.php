@@ -293,6 +293,10 @@ class Webservice extends MX_Controller {
     	}
     }
 
+    public function definirNombreImagenEspecie($nombreEspecie){
+        return strtolower(str_replace( array(" "), array("_"), $nombreEspecie));
+    }
+
     public function especies() {
     	$servicio = $this->uri->segment(3);
     	$this->load->model("Especie");
@@ -304,6 +308,22 @@ class Webservice extends MX_Controller {
     		$especiesArr = $this->Especie->obtenerEspecies( $filtro, $this->obtenerIdxPrimerRegistro($pagina), $this->nroRegistrosPorPagina);
     		$nroEspcies = $this->Especie->contarEspecies();
 
+            $i = 0;
+            foreach ($especiesArr as $key => $val) {
+                $ruta = "assets/imagenes/especies/";
+                $nombreImg = $this->definirNombreImagenEspecie($val['nombre_especie']);
+                if(file_exists( $ruta . $nombreImg . ".png" )) {
+                    $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".png";
+                } else if(file_exists( $ruta . $nombreImg . ".jpeg" )) {
+                    $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpeg";
+                } else if(file_exists( $ruta . $nombreImg . ".jpg" )) {
+                    $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpg";
+                } else {
+                    $especiesArr[$i]['imagen_especie'] = $ruta . "icono-pescado-64.png";
+                }
+                $i++;
+            }
+
     		echo json_encode( 
     			array(
     				"total_registros" => intval($nroEspcies[0]['nro_especies']),
@@ -314,6 +334,28 @@ class Webservice extends MX_Controller {
     		);
 
     	}
+        if( $servicio === "carga_imagen"){
+            $idEspecie = $this->uri->segment(4);
+            $this->load->model("Especie");
+
+            // Definir nombre de imagen
+            $especie = $this->Especie->obtenerEspecieConId( $idEspecie, array("nombre_especie"));
+            $nombreImg = $this->definirNombreImagenEspecie($especie[0]['nombre_especie']);
+
+            // Carga de archivo
+            $rutaDir = "assets/imagenes/especies/";
+            $archivo = $_FILES['file']['name'];
+            $mimeType = mime_content_type($_FILES['file']['tmp_name']);
+            $ext = pathinfo( $archivo, PATHINFO_EXTENSION);
+            $nombrArchivoStr = $nombreImg . "." . $ext;
+            $archivoRuta = $rutaDir . $nombrArchivoStr;
+            if(!move_uploaded_file( $_FILES['file']['tmp_name'], $archivoRuta)) {
+                die ( json_encode(array( "tipo" => "error", "mensaje" => "No se pudo subir el archivo correctamente!")) );
+            } else {
+                die ( json_encode(array( "tipo" => "notificacion", "mensaje" => "Se subió el archivo correctamente!")) );
+            }
+
+        }
     }
 
     public function metales() {
