@@ -8,6 +8,11 @@ class Especie extends CI_Model {
 		$this->load->database();
 	}
 
+	public function limpiarTabla() {
+		$sql = "DELETE FROM " . $this->nombreTabla;
+		$query = $this->db->query($sql);
+	}
+
 	public function convertirCharsDeURL($str) {
 		$buscar = array("%2C", "%20");
 		$remplazar = array(",","%");

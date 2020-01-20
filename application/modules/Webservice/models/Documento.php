@@ -10,6 +10,11 @@ class Documento extends CI_Model {
 		return str_replace( $buscar, $remplazar, $str); 
 	}
 
+	public function limpiarTabla() {
+		$sql = "DELETE FROM " . $this->nombreTabla;
+		$query = $this->db->query($sql);
+	}
+	
 	public function __construct(){
 		parent::__construct();
 		$this->load->database();

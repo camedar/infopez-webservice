@@ -46,8 +46,15 @@ class Webservice extends MX_Controller {
     }
 
     public function carga_archivo() {
+        set_time_limit(500);
     	error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
     	$this->load->model(array("Documento", "TipoDocumento", "DocumentoConcentracionMetal", "Pais", "Especie", "Metal"));
+        // Limpiar tablas
+        $this->DocumentoConcentracionMetal->limpiarTabla();
+        $this->Documento->limpiarTabla();
+        $this->Metal->limpiarTabla();
+        $this->Especie->limpiarTabla();
+        // Carga de archivo
     	$rutaDir = "assets/documentos/";
     	$archivo = $_FILES['file']['name'];
     	$mimeType = mime_content_type($_FILES['file']['tmp_name']);
@@ -110,7 +117,7 @@ class Webservice extends MX_Controller {
 		}
 
 		foreach ($sheetData as $key => $fila) {
-			if($titulos){
+			if($titulos || $fila['A'] == ""){
 				$titulos = false;
 				continue;
 			}

@@ -12,4 +12,9 @@ class DocumentoConcentracionMetal extends CI_Model {
 		$this->db->insert( $this->nombreTabla, $datosArr);
     	return $this->db->insert_id();
 	}
+
+	public function limpiarTabla() {
+		$sql = "DELETE FROM " . $this->nombreTabla;
+		$query = $this->db->query($sql);
+	}
 }

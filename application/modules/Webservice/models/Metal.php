@@ -8,6 +8,11 @@ class Metal extends CI_Model {
 		$this->load->database();
 	}
 
+	public function limpiarTabla() {
+		$sql = "DELETE FROM " . $this->nombreTabla;
+		$query = $this->db->query($sql);
+	}
+
 	public function insertar($datosArr) {
 		$this->db->insert( $this->nombreTabla, $datosArr);
     	return $this->db->insert_id();
