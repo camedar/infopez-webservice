@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+//application/controllers/JwtToken.php
+require APPPATH . '/libraries/CreatorJwt.php';
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class Webservice extends MX_Controller {
@@ -11,6 +13,9 @@ class Webservice extends MX_Controller {
         parent::__construct();
         $this->load->helper('path');
         $this->load->helper('url');
+
+        $this->objOfJwt = new CreatorJwt();
+        header('Content-Type: application/json');
     }
 
     public function obtenerIdxPrimerRegistro($pagina){
@@ -425,5 +430,41 @@ class Webservice extends MX_Controller {
     		);
 
     	}
+    }
+
+    public function sesion(){
+        $servicio = $this->uri->segment(3);
+        if($servicio === "iniciar"){
+
+        }
+
+        if($servicio === "cerrar"){
+
+        }
+        echo password_hash( "clave", PASSWORD_DEFAULT);
+    }
+
+    public function tokenInicioSesion()
+    {
+        $tokenData['uniqueId'] = '11';
+        $tokenData['role'] = 'alamgir';
+        $tokenData['timeStamp'] = Date('Y-m-d h:i:s');
+        $jwtToken = $this->objOfJwt->GenerateToken($tokenData);
+        echo json_encode(array('Token'=>$jwtToken));
+    }
+             
+    public function obtenerDatosToken()
+    {
+        $received_Token = $this->input->request_headers('Authorization');
+        try
+        {
+            $jwtData = $this->objOfJwt->DecodeToken($received_Token['Token']);
+            echo json_encode($jwtData);
+        }
+        catch (Exception $e)
+        {
+            http_response_code('401');
+            echo json_encode(array( "status" => false, "message" => $e->getMessage()));exit;
+        }
     }
 } 

@@ -91,6 +91,8 @@ fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (id)
 );
 
+INSERT INTO usuario(nombre_usuario,nombres,apellidos,email,clave) VALUES('admin','Admin','Infopez','ellie.lopez@usa.edu.co','$2y$10$JAG.fjvY/UIZzEyLH1W6weYH7PA4zk95d47X6Ne9USWZuJQKD9vMG');
+
 INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Cadmio','Cd',0.001);
 INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Cobre','Cu',0.04);
 INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Cromo','Cr',1.5);
