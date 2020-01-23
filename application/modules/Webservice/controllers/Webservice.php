@@ -432,24 +432,44 @@ class Webservice extends MX_Controller {
     	}
     }
 
+    public function validarInput($str){
+        return trim(striplashes(htmlspecialchars($str)));
+    }
+
     public function sesion(){
         $servicio = $this->uri->segment(3);
+        $this->load->model("Usuario");
         if($servicio === "iniciar"){
+            $requestData = json_decode(file_get_contents('php://input'), true);
+            $username = validarInput($requestData['username']);
+            $password = md5(validarInput($requestData['password']));
+            $usuario = $this->Usuario->obtenerUsuarioContrasena( $username, $password, array("id","nombres","apellidos","nombre_usuario"));
 
+            if(is_array($usuario) && !empty($usuario)){
+                $datosUsuario = array(
+                    "nombres" => $usuario[0]['nombres'],
+                    "apellidos" => $usuario[0]['apellidos'],
+                    "nombre_usuario" => $usuario[0]['nombre_usuario'],
+                    "nombre_usuario" => $usuario[0]['nombre_usuario'],
+                    "username" => $username,
+                    "password" => $password,
+                    "time_stamp" => Date('Y-m-d h:i:s')
+                );
+                tokenInicioSesion($datosUsuario);
+            } else {
+                echo json_encode(array("tipo" => "error", "mensaje" => "Usuario o contraseña incorrecta!");
+            }
         }
 
         if($servicio === "cerrar"){
 
         }
-        echo password_hash( "clave", PASSWORD_DEFAULT);
+        echo password_hash( "admin", PASSWORD_DEFAULT);
     }
 
-    public function tokenInicioSesion()
+    public function tokenInicioSesion($datosToken)
     {
-        $tokenData['uniqueId'] = '11';
-        $tokenData['role'] = 'alamgir';
-        $tokenData['timeStamp'] = Date('Y-m-d h:i:s');
-        $jwtToken = $this->objOfJwt->GenerateToken($tokenData);
+        $jwtToken = $this->objOfJwt->GenerateToken($datosToken);
         echo json_encode(array('Token'=>$jwtToken));
     }
              

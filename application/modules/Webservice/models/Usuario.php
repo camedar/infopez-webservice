@@ -7,4 +7,15 @@ class Usuario extends CI_Model {
 		parent::__construct();
 		$this->load->database();
 	}
+
+	public function obtenerUsuarioContrasena( $email, $password, $columnasArr){
+		if(is_array($columnasArr) && sizeof($columnasArr)>0) {
+			$this->db->select(implode(",", $columnasArr));
+			$this->db->where( "email", $email);
+			$this->db->where( "clave", $password);
+			$query = $this->db->get($this->nombreTabla);
+			return $query->result_array();
+		}
+	}
+	
 }
