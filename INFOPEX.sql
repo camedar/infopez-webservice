@@ -81,8 +81,7 @@ FOREIGN KEY (especie_id) REFERENCES especie (id)
 CREATE TABLE usuario (
 id INT(8) AUTO_INCREMENT,
 nombre_usuario VARCHAR(30) NOT NULL,
-nombres VARCHAR(50) NOT NULL,
-apellidos VARCHAR(50) NOT NULL,
+nombre VARCHAR(50) NOT NULL,
 email VARCHAR(100) NOT NULL,
 clave VARCHAR(255) NOT NULL,
 estado TINYINT NOT NULL DEFAULT 1,
@@ -91,7 +90,7 @@ fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (id)
 );
 
-INSERT INTO usuario(nombre_usuario,nombres,apellidos,email,clave) VALUES('admin','Admin','Infopez','ellie.lopez@usa.edu.co','$2y$10$JAG.fjvY/UIZzEyLH1W6weYH7PA4zk95d47X6Ne9USWZuJQKD9vMG');
+INSERT INTO usuario(nombre_usuario,nombre,email,clave) VALUES('admin','Ellie López','ellie.lopez@usa.edu.co','21232f297a57a5a743894a0e4a801fc3');
 
 INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Cadmio','Cd',0.001);
 INSERT INTO metal_dosis_ref_oral(nombre_metal,simbolo_metal,RFD) VALUES('Cobre','Cu',0.04);

@@ -433,7 +433,7 @@ class Webservice extends MX_Controller {
     }
 
     public function validarInput($str){
-        return trim(striplashes(htmlspecialchars($str)));
+        return trim(stripslashes(htmlspecialchars($str)));
     }
 
     public function sesion(){
@@ -441,36 +441,36 @@ class Webservice extends MX_Controller {
         $this->load->model("Usuario");
         if($servicio === "iniciar"){
             $requestData = json_decode(file_get_contents('php://input'), true);
-            $username = validarInput($requestData['username']);
-            $password = md5(validarInput($requestData['password']));
-            $usuario = $this->Usuario->obtenerUsuarioContrasena( $username, $password, array("id","nombres","apellidos","nombre_usuario"));
+            $username = $this->validarInput($requestData['username']);
+            $password = md5($this->validarInput($requestData['password']));
+            $usuario = $this->Usuario->obtenerUsuarioContrasena( $username, $password, array("id","nombre","nombre_usuario"));
 
             if(is_array($usuario) && !empty($usuario)){
                 $datosUsuario = array(
-                    "nombres" => $usuario[0]['nombres'],
-                    "apellidos" => $usuario[0]['apellidos'],
-                    "nombre_usuario" => $usuario[0]['nombre_usuario'],
-                    "nombre_usuario" => $usuario[0]['nombre_usuario'],
-                    "username" => $username,
+                    "nombre" => $usuario[0]['nombre'],
+                    "email" => $username,
                     "password" => $password,
-                    "time_stamp" => Date('Y-m-d h:i:s')
+                    "timestamp" => Date('Y-m-d h:i:s')
                 );
-                tokenInicioSesion($datosUsuario);
+                $this->tokenInicioSesion($datosUsuario);
             } else {
-                echo json_encode(array("tipo" => "error", "mensaje" => "Usuario o contraseña incorrecta!");
+                echo json_encode(array("tipo" => "error", "mensaje" => "Usuario o contraseña incorrecta!"));
             }
         }
 
         if($servicio === "cerrar"){
 
         }
-        echo password_hash( "admin", PASSWORD_DEFAULT);
     }
 
     public function tokenInicioSesion($datosToken)
     {
         $jwtToken = $this->objOfJwt->GenerateToken($datosToken);
-        echo json_encode(array('Token'=>$jwtToken));
+        echo json_encode(array(
+            'tipo' => 'credenciales',
+            'Token'=>$jwtToken,
+            'datos_usuario' => $datosToken
+        ));
     }
              
     public function obtenerDatosToken()
