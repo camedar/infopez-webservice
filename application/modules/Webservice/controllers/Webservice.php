@@ -13,8 +13,8 @@ class Webservice extends MX_Controller {
         parent::__construct();
         $this->load->helper('path');
         $this->load->helper('url');
-
         $this->objOfJwt = new CreatorJwt();
+        ini_set('display_errors', 'Off');
         header('Content-Type: application/json');
     }
 
@@ -52,7 +52,10 @@ class Webservice extends MX_Controller {
 
     public function carga_archivo() {
         set_time_limit(500);
-    	error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+// Validar que en los headers venga el JWT
+        if(!$this->validarJWT()) {
+            exit;
+        }
     	$this->load->model(array("Documento", "TipoDocumento", "DocumentoConcentracionMetal", "Pais", "Especie", "Metal"));
         // Limpiar tablas
         $this->DocumentoConcentracionMetal->limpiarTabla();
@@ -347,6 +350,11 @@ class Webservice extends MX_Controller {
             $especie = $this->Especie->obtenerEspecieConId( $idEspecie, array("nombre_especie"));
             $nombreImg = $this->definirNombreImagenEspecie($especie[0]['nombre_especie']);
 
+            // Validar que en los headers venga el JWT
+            if(!$this->validarJWT()) {
+                exit;
+            }
+
             // Carga de archivo
             $rutaDir = "assets/imagenes/especies/";
             $archivo = $_FILES['file']['name'];
@@ -371,6 +379,11 @@ class Webservice extends MX_Controller {
     		$pagina = $this->uri->segment(4);
     		$filtro = $this->uri->segment(5);
 
+            // Validar que en los headers venga el JWT
+            if(!$this->validarJWT()) {
+                exit;
+            }
+
     		$metalesArr = $this->Metal->obtenerMetales( $filtro, $this->obtenerIdxPrimerRegistro($pagina), $this->nroRegistrosPorPagina);
     		$nroMetales = $this->Metal->contarMetales();
 
@@ -393,6 +406,11 @@ class Webservice extends MX_Controller {
     	if( $servicio === "traer_metales"){
     		$pagina = $this->uri->segment(4);
     		$filtro = $this->uri->segment(5);
+
+            // Validar que en los headers venga el JWT
+            if(!$this->validarJWT()) {
+                exit;
+            }
 
     		$metalesArr = $this->MetalDosisRefOral->obtenerMetalesDosis( $filtro, $this->obtenerIdxPrimerRegistro($pagina), $this->nroRegistrosPorPagina);
     		$nroMetales = $this->MetalDosisRefOral->contarMetalesDosis();
@@ -452,7 +470,7 @@ class Webservice extends MX_Controller {
                     "password" => $password,
                     "timestamp" => Date('Y-m-d h:i:s')
                 );
-                $this->tokenInicioSesion($datosUsuario);
+                $this->generarJWT($datosUsuario);
             } else {
                 echo json_encode(array("tipo" => "error", "mensaje" => "Usuario o contraseña incorrecta!"));
             }
@@ -463,7 +481,7 @@ class Webservice extends MX_Controller {
         }
     }
 
-    public function tokenInicioSesion($datosToken)
+    public function generarJWT($datosToken)
     {
         $jwtToken = $this->objOfJwt->GenerateToken($datosToken);
         echo json_encode(array(
@@ -473,18 +491,23 @@ class Webservice extends MX_Controller {
         ));
     }
              
-    public function obtenerDatosToken()
+    public function validarJWT()
     {
-        $received_Token = $this->input->request_headers('Authorization');
+        $tokenRecibido = $this->input->request_headers('Authorization');
+        
+        if(!array_key_exists('Token', $tokenRecibido)){
+            echo json_encode(array('tipo' => 'notificacion', 'mensaje' => "Acceso denegado por falta de credenciales!"));
+            exit;
+        }
         try
         {
-            $jwtData = $this->objOfJwt->DecodeToken($received_Token['Token']);
-            echo json_encode($jwtData);
+            $jwtData = $this->objOfJwt->DecodeToken($tokenRecibido['Token']);
+            return true;
         }
         catch (Exception $e)
         {
             http_response_code('401');
-            echo json_encode(array( "status" => false, "message" => $e->getMessage()));exit;
+            echo json_encode(array( "status" => false, "mensaje" => $e->getMessage()));exit;
         }
     }
-} 
+}
