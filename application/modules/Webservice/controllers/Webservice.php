@@ -481,6 +481,28 @@ class Webservice extends MX_Controller {
         }
     }
 
+    public function contacto(){
+        $servicio = $this->uri->segment(3);
+
+        if($servicio === "enviar_correo"){
+            $requestData = json_decode(file_get_contents('php://input'), true);
+            $nombre = $this->validarInput($requestData['nombre']);
+            $email = $this->validarInput($requestData['email']);
+            $mensaje = $this->validarInput($requestData['mensaje']);
+            
+            if(strlen($mensaje) > 70){
+                $message = wordwrap($message, 70, "\r\n");
+            }
+
+            $this->load->model("Usuario");
+            $emailDestinatario = $this->Usuario->obtenerUsuarioAdmin(array('email'))[0]['email'];
+           
+            $cabeceras = 'Content-type: text/html; charset=utf-8' . "\r\n";
+            mail( $emailDestinatario, 'Contacto Infopez', "<p><b>Nombre:</b> $nombre</p> <p><b>Email:</b> $email </p> <b>Mensaje:</b><p>$mensaje</p>", $cabeceras);
+            echo json_encode(array( 'tipo'=>'info', 'mensaje' => '¡Mensaje Enviado!'));
+        }
+    }
+
     public function generarJWT($datosToken)
     {
         $jwtToken = $this->objOfJwt->GenerateToken($datosToken);

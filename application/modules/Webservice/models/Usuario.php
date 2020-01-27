@@ -17,5 +17,14 @@ class Usuario extends CI_Model {
 			return $query->result_array();
 		}
 	}
+
+	public function obtenerUsuarioAdmin($columnasArr){
+		if(is_array($columnasArr) && sizeof($columnasArr)>0) {
+			$this->db->select(implode(",", $columnasArr));
+			$this->db->where( "nombre_usuario", 'admin');
+			$query = $this->db->get($this->nombreTabla);
+			return $query->result_array();
+		}
+	}
 	
 }
