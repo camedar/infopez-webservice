@@ -8,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class Webservice extends MX_Controller {
 
 	var $nroRegistrosPorPagina = 20;
+    var $rutaDocumentos = "assets/documentos/";
 
     function __construct() {
         parent::__construct();
@@ -50,9 +51,26 @@ class Webservice extends MX_Controller {
 
     }
 
+    public function descargar_archivo(){
+        $archivo = $this->uri->segment(3);
+        $ruta = $this->rutaDocumentos . "/" . $archivo;
+
+        if (file_exists($ruta)) {
+            header('Content-Description: descarga de archivo');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="'.basename($archivo).'"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($ruta));
+            readfile($ruta);
+            exit;
+        }
+    }
+
     public function carga_archivo() {
         set_time_limit(500);
-// Validar que en los headers venga el JWT
+        // Validar que en los headers venga el JWT
         if(!$this->validarJWT()) {
             exit;
         }
@@ -63,7 +81,7 @@ class Webservice extends MX_Controller {
         $this->Metal->limpiarTabla();
         $this->Especie->limpiarTabla();
         // Carga de archivo
-    	$rutaDir = "assets/documentos/";
+    	$rutaDir = $this->rutaDocumentos;
     	$archivo = $_FILES['file']['name'];
     	$mimeType = mime_content_type($_FILES['file']['tmp_name']);
     	$ext = pathinfo( $archivo, PATHINFO_EXTENSION);
@@ -106,7 +124,7 @@ class Webservice extends MX_Controller {
 		    "Especie",
 		    "Nombre comun",
 		    "Nombre inglés",
-		    "Metal ",
+		    "Metal",
 		    "Concentración Mínima",
 		    "Concentración Máxima",
 		    "Unidades de concentración",
@@ -153,9 +171,6 @@ class Webservice extends MX_Controller {
 							"nombre_especie" => $fila['T'],
 							"nombre_comun" => $fila['U'],
 							"nombre_ingles" => $fila['V'],
-							"minimo" => utf8_encode($fila['X']),
-							"maximo" => utf8_encode($fila['Y']),
-							"unidad" => utf8_encode($fila['Z']),
 						)
 					);
 				} else {
@@ -216,6 +231,9 @@ class Webservice extends MX_Controller {
 			$datos['especie_id'] = $idEspecie;
 			$datos['longitud'] = $longitud;
 			$datos['latitud'] = $latitud;
+            $datos['concentracion_minima'] = utf8_encode($fila['X']);
+            $datos['concentracion_maxima'] = utf8_encode($fila['Y']);
+            $datos['concentracion_unidad'] = utf8_encode($fila['Z']);
 
 			$documentoConcentracionMetalID = $this->DocumentoConcentracionMetal->insertar( $datos);
 		}
