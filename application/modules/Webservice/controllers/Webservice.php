@@ -287,6 +287,8 @@ class Webservice extends MX_Controller {
     		$iniciales = $this->uri->segment(4);
     		$coincidencias = $this->Especie->especiesAutoCompletar( $iniciales);
 
+            $coincidencias = $this->agregarImagenListaEspecies($coincidencias);
+
     		echo json_encode($coincidencias);
     	}
     }
@@ -305,6 +307,25 @@ class Webservice extends MX_Controller {
         return strtolower(str_replace( array(" "), array("_"), $nombreEspecie));
     }
 
+    public function agregarImagenListaEspecies($especiesArr){
+        $i = 0;
+        foreach ($especiesArr as $key => $val) {
+            $ruta = "assets/imagenes/especies/";
+            $nombreImg = $this->definirNombreImagenEspecie($val['nombre_especie']);
+            if(file_exists( $ruta . $nombreImg . ".png" )) {
+                $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".png";
+            } else if(file_exists( $ruta . $nombreImg . ".jpeg" )) {
+                $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpeg";
+            } else if(file_exists( $ruta . $nombreImg . ".jpg" )) {
+                $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpg";
+            } else {
+                $especiesArr[$i]['imagen_especie'] = $ruta . "icono-pescado-128.png";
+            }
+            $i++;
+        }
+        return $especiesArr;
+    }
+
     public function especies() {
     	$servicio = $this->uri->segment(3);
     	$this->load->model("Especie");
@@ -316,21 +337,7 @@ class Webservice extends MX_Controller {
     		$especiesArr = $this->Especie->obtenerEspecies( $filtro, $this->obtenerIdxPrimerRegistro($pagina), $this->nroRegistrosPorPagina);
     		$nroEspcies = $this->Especie->contarEspecies();
 
-            $i = 0;
-            foreach ($especiesArr as $key => $val) {
-                $ruta = "assets/imagenes/especies/";
-                $nombreImg = $this->definirNombreImagenEspecie($val['nombre_especie']);
-                if(file_exists( $ruta . $nombreImg . ".png" )) {
-                    $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".png";
-                } else if(file_exists( $ruta . $nombreImg . ".jpeg" )) {
-                    $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpeg";
-                } else if(file_exists( $ruta . $nombreImg . ".jpg" )) {
-                    $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpg";
-                } else {
-                    $especiesArr[$i]['imagen_especie'] = $ruta . "icono-pescado-64.png";
-                }
-                $i++;
-            }
+            $especiesArr = $this->agregarImagenListaEspecies($especiesArr);
 
     		echo json_encode( 
     			array(
