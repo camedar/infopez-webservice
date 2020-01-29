@@ -66,8 +66,8 @@ class Especie extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function obtenerMetalesAsociadosAEspecie($especieId){
-		$sql = "SELECT DISTINCT mdro.nombre_metal FROM documento_concentracion_metal dcm INNER JOIN especie e ON dcm.especie_id=e.id INNER JOIN metal m ON dcm.metal_id=m.id INNER JOIN metal_dosis_ref_oral mdro ON lower(m.nombre) LIKE CONCAT('%',lower(mdro.nombre_metal),'%') WHERE dcm.especie_id = " . $especieId;
+	public function obtenerConcentracionMaxIndiceMetales($especieId){
+		$sql = "SELECT mdro.id,mdro.nombre_metal, mdro.simbolo_metal,MAX(CONVERT(dcm.concentracion_maxima, DOUBLE)) AS concentracion_maxima, mdro.RFD FROM documento_concentracion_metal dcm INNER JOIN especie e ON dcm.especie_id=e.id INNER JOIN metal m ON dcm.metal_id=m.id INNER JOIN metal_dosis_ref_oral mdro ON lower(m.nombre) LIKE CONCAT('%',lower(mdro.nombre_metal),'%') WHERE dcm.especie_id = " . $especieId . " GROUP BY mdro.id";
 		$query = $this->db->query($sql);
 
 		return $query->result_array();

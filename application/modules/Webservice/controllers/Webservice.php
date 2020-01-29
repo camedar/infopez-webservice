@@ -281,25 +281,36 @@ class Webservice extends MX_Controller {
     		$edad = $requestData['edad'];
     		$frecuencia = $requestData['frecuencia'];
     		$consumo = $requestData['consumo'];
-    		$metalId = $requestData['metal'];
-    		$metalesDosisRefOral = "";
 
     		$THQ = "-";
-    		if($metalId){
-    			$metalesDosisRefOral = $this->MetalDosisRefOral->consultarMetalDosis($metalId);
-    			$concentracionMaxima = $this->Especie->obtenerEspecieConId( $especieId, array("maximo"));
-    			$EF = 52.143 * $frecuencia;
-    			$ED = $edad;
-    			$FIR = $consumo / 1000;
-    			$MC = $concentracionMaxima[0]['maximo'];
-    			$RFD = $metalesDosisRefOral[0]['RFD'];
-    			$BW = $peso;
-    			$AT = $EF * $ED;
+    		if($especieId){
+                $metales = $this->Especie->obtenerConcentracionMaxIndiceMetales($especieId);
+                $respuestaArr = array();
+                foreach ($metales as $key => $metal) {
+        			$metalInfo = $metal;
+        			$EF = 52.143 * $frecuencia;
+        			$ED = $edad;
+        			$FIR = $consumo / 1000;
+        			$MC = floatval($metalInfo['concentracion_maxima']);
+        			$RFD = floatval($metalInfo['RFD']);
+        			$BW = $peso;
+        			$AT = $EF * $ED;
 
-    			$THQ = ( ($EF * $ED * $FIR * $MC) / ($RFD * $BW * $AT) ) * (0.01);
+        			$THQ = ( ($EF * $ED * $FIR * $MC) / ($RFD * $BW * $AT) ) * (0.01);
+                    $metalInfo['indice'] = round( $THQ, 2);
+                    if($THQ >= 1){
+                        $metalInfo['nivel_riesgo'] = 3;
+                    } else if($THQ >= 0.5){
+                        $metalInfo['nivel_riesgo'] = 2;
+                    } else {
+                        $metalInfo['nivel_riesgo'] = 1;
+                    }
+
+                    array_push( $respuestaArr, $metalInfo);
+                }
     		}
 
-    		echo json_encode($THQ);
+    		echo json_encode($respuestaArr);
     	} else if($servicio === "especies") {
     		$this->load->model("Especie");
     		$iniciales = $this->uri->segment(4);
