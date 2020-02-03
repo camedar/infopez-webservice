@@ -19,6 +19,7 @@ class Webservice extends MX_Controller {
         header('Content-Type: application/json');
     }
 
+    // Metodos
     public function obtenerIdxPrimerRegistro($pagina){
     	return ($pagina-1) * $this->nroRegistrosPorPagina;
     }
@@ -51,7 +52,69 @@ class Webservice extends MX_Controller {
 
     }
 
-    public function descargar_archivo(){
+    public function definirNombreImagenEspecie($nombreEspecie){
+        return strtolower(str_replace( array(" "), array("_"), $nombreEspecie));
+    }
+
+    public function agregarImagenListaEspecies($especiesArr){
+        $i = 0;
+        foreach ($especiesArr as $key => $val) {
+            $ruta = "assets/imagenes/especies/";
+            $nombreImg = $this->definirNombreImagenEspecie($val['nombre_especie']);
+            if(file_exists( $ruta . $nombreImg . ".png" )) {
+                $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".png";
+            } else if(file_exists( $ruta . $nombreImg . ".jpeg" )) {
+                $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpeg";
+            } else if(file_exists( $ruta . $nombreImg . ".jpg" )) {
+                $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpg";
+            } else {
+                $especiesArr[$i]['imagen_especie'] = $ruta . "icono-pescado-128.png";
+            }
+            $i++;
+        }
+        return $especiesArr;
+    }
+
+    public function validarInput($str){
+        return trim(stripslashes(htmlspecialchars($str)));
+    }
+
+    public function generarJWT($datosToken)
+    {
+        $jwtToken = $this->objOfJwt->GenerateToken($datosToken);
+        echo json_encode(array(
+            'tipo' => 'credenciales',
+            'Token'=>$jwtToken,
+            'datos_usuario' => $datosToken
+        ));
+    }
+             
+    public function validarJWT()
+    {
+        $tokenRecibido = $this->input->request_headers('Authorization');
+        
+        if(!array_key_exists('Token', $tokenRecibido)){
+            echo json_encode(array('tipo' => 'notificacion', 'mensaje' => "Acceso denegado por falta de credenciales!"));
+            exit;
+        }
+        try
+        {
+            $jwtData = $this->objOfJwt->DecodeToken($tokenRecibido['Token']);
+            return true;
+        }
+        catch (Exception $e)
+        {
+            http_response_code('401');
+            echo json_encode(array( "status" => false, "mensaje" => $e->getMessage()));exit;
+        }
+    }
+
+    // Servicios
+    
+    /**
+     * /descargar_archivo/
+     */
+    public function descrgar_archivo(){
         $archivo = $this->uri->segment(3);
         $ruta = $this->rutaDocumentos . "/" . $archivo;
 
@@ -68,6 +131,9 @@ class Webservice extends MX_Controller {
         }
     }
 
+    /**
+     * /carga_archivo/
+     */
     public function carga_archivo() {
         set_time_limit(500);
         // Validar que en los headers venga el JWT
@@ -266,6 +332,11 @@ class Webservice extends MX_Controller {
     	}
     }
 
+    /**
+     * /calculadora/traer_metales_dosis_ref_oral
+     * /calculadora/hacer_calculo
+     * 
+     */
     public function calculadora() {
     	$this->load->model( array("MetalDosisRefOral", "Especie") );
     	$servicio = $this->uri->segment(3);
@@ -328,6 +399,9 @@ class Webservice extends MX_Controller {
     	}
     }
 
+    /**
+     * /mapa/traer_docs_coord
+     */
     public function mapa(){
     	$servicio = $this->uri->segment(3);
     	$this->load->model("documento");
@@ -338,29 +412,10 @@ class Webservice extends MX_Controller {
     	}
     }
 
-    public function definirNombreImagenEspecie($nombreEspecie){
-        return strtolower(str_replace( array(" "), array("_"), $nombreEspecie));
-    }
-
-    public function agregarImagenListaEspecies($especiesArr){
-        $i = 0;
-        foreach ($especiesArr as $key => $val) {
-            $ruta = "assets/imagenes/especies/";
-            $nombreImg = $this->definirNombreImagenEspecie($val['nombre_especie']);
-            if(file_exists( $ruta . $nombreImg . ".png" )) {
-                $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".png";
-            } else if(file_exists( $ruta . $nombreImg . ".jpeg" )) {
-                $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpeg";
-            } else if(file_exists( $ruta . $nombreImg . ".jpg" )) {
-                $especiesArr[$i]['imagen_especie'] = $ruta . $nombreImg . ".jpg";
-            } else {
-                $especiesArr[$i]['imagen_especie'] = $ruta . "icono-pescado-128.png";
-            }
-            $i++;
-        }
-        return $especiesArr;
-    }
-
+    /**
+     * /especies/traer_especies
+     * /especies/carga_imagen
+     */
     public function especies() {
     	$servicio = $this->uri->segment(3);
     	$this->load->model("Especie");
@@ -413,6 +468,9 @@ class Webservice extends MX_Controller {
         }
     }
 
+    /**
+     * /metales/traer_metales
+     */
     public function metales() {
     	$servicio = $this->uri->segment(3);
     	$this->load->model("Metal");
@@ -441,6 +499,9 @@ class Webservice extends MX_Controller {
     	}
     }
 
+    /**
+     * /metaldosisreforal/traer_metales
+     */
     public function metaldosisreforal() {
     	$servicio = $this->uri->segment(3);
     	$this->load->model("MetalDosisRefOral");
@@ -469,8 +530,11 @@ class Webservice extends MX_Controller {
     	}
     }
 
+    /**
+     * /documento/traer_documentos
+     */
     public function documento() {
-    	$servicio = $this->uri->segment(3);
+    	$servicio = $thidocumentos->uri->segment(3);
     	$this->load->model("Documento");
 
     	if( $servicio === "traer_documentos"){
@@ -492,10 +556,9 @@ class Webservice extends MX_Controller {
     	}
     }
 
-    public function validarInput($str){
-        return trim(stripslashes(htmlspecialchars($str)));
-    }
-
+    /**
+     * /sesion/iniciar
+     */
     public function sesion(){
         $servicio = $this->uri->segment(3);
         $this->load->model("Usuario");
@@ -517,12 +580,11 @@ class Webservice extends MX_Controller {
                 echo json_encode(array("tipo" => "error", "mensaje" => "Usuario o contraseña incorrecta!"));
             }
         }
-
-        if($servicio === "cerrar"){
-
-        }
     }
 
+    /**
+     * /contacto/enviar_correo
+     */
     public function contacto(){
         $servicio = $this->uri->segment(3);
 
@@ -545,33 +607,4 @@ class Webservice extends MX_Controller {
         }
     }
 
-    public function generarJWT($datosToken)
-    {
-        $jwtToken = $this->objOfJwt->GenerateToken($datosToken);
-        echo json_encode(array(
-            'tipo' => 'credenciales',
-            'Token'=>$jwtToken,
-            'datos_usuario' => $datosToken
-        ));
-    }
-             
-    public function validarJWT()
-    {
-        $tokenRecibido = $this->input->request_headers('Authorization');
-        
-        if(!array_key_exists('Token', $tokenRecibido)){
-            echo json_encode(array('tipo' => 'notificacion', 'mensaje' => "Acceso denegado por falta de credenciales!"));
-            exit;
-        }
-        try
-        {
-            $jwtData = $this->objOfJwt->DecodeToken($tokenRecibido['Token']);
-            return true;
-        }
-        catch (Exception $e)
-        {
-            http_response_code('401');
-            echo json_encode(array( "status" => false, "mensaje" => $e->getMessage()));exit;
-        }
-    }
 }
