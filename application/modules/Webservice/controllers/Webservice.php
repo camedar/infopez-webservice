@@ -286,6 +286,8 @@ class Webservice extends MX_Controller {
     		if($especieId){
                 $metales = $this->Especie->obtenerConcentracionMaxIndiceMetales($especieId);
                 $respuestaArr = array();
+                $indiceMayor = -100;
+                $posIndiceMayor = 0;
                 foreach ($metales as $key => $metal) {
         			$metalInfo = $metal;
         			$EF = 52.143 * $frecuencia;
@@ -298,6 +300,10 @@ class Webservice extends MX_Controller {
 
         			$THQ = ( ($EF * $ED * $FIR * $MC) / ($RFD * $BW * $AT) ) * (0.01);
                     $metalInfo['indice'] = round( $THQ, 2);
+                    if( $THQ > $indiceMayor){
+                        $indiceMayor = $THQ;
+                        $posIndiceMayor = $key;
+                    }
                     if($THQ >= 1){
                         $metalInfo['nivel_riesgo'] = 3;
                     } else if($THQ >= 0.5){
@@ -310,7 +316,7 @@ class Webservice extends MX_Controller {
                 }
     		}
 
-    		echo json_encode($respuestaArr);
+    		echo json_encode($respuestaArr[$posIndiceMayor]);
     	} else if($servicio === "especies") {
     		$this->load->model("Especie");
     		$iniciales = $this->uri->segment(4);
