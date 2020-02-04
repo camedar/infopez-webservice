@@ -114,7 +114,7 @@ class Webservice extends MX_Controller {
     /**
      * /descargar_archivo/
      */
-    public function descrgar_archivo(){
+    public function descargar_archivo(){
         $archivo = $this->uri->segment(3);
         $ruta = $this->rutaDocumentos . "/" . $archivo;
 
