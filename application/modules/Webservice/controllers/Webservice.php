@@ -534,7 +534,7 @@ class Webservice extends MX_Controller {
      * /documento/traer_documentos
      */
     public function documento() {
-    	$servicio = $thidocumentos->uri->segment(3);
+    	$servicio = $this->uri->segment(3);
     	$this->load->model("Documento");
 
     	if( $servicio === "traer_documentos"){
