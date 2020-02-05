@@ -141,11 +141,6 @@ class Webservice extends MX_Controller {
             exit;
         }
     	$this->load->model(array("Documento", "TipoDocumento", "DocumentoConcentracionMetal", "Pais", "Especie", "Metal"));
-        // Limpiar tablas
-        $this->DocumentoConcentracionMetal->limpiarTabla();
-        $this->Documento->limpiarTabla();
-        $this->Metal->limpiarTabla();
-        $this->Especie->limpiarTabla();
         // Carga de archivo
     	$rutaDir = $this->rutaDocumentos;
     	$archivo = $_FILES['file']['name'];
@@ -208,6 +203,12 @@ class Webservice extends MX_Controller {
 			die ( json_encode(array( "tipo" => "error", "mensaje" => "El estructura del archivo no es válida, verifique número de columnas y títulos!")) );
 		}
 
+        // Limpiar tablas
+        $this->DocumentoConcentracionMetal->limpiarTabla();
+        $this->Documento->limpiarTabla();
+        $this->Metal->limpiarTabla();
+        $this->Especie->limpiarTabla();
+        // Inicia carga de archivo
 		foreach ($sheetData as $key => $fila) {
 			if($titulos || $fila['A'] == ""){
 				$titulos = false;

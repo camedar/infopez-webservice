@@ -12,7 +12,7 @@ PRIMARY KEY(id)
 
 CREATE TABLE tipo_documento (
 id INT(3) AUTO_INCREMENT,
-nombre VARCHAR(50) NOT NULL,
+nombre VARCHAR(255) NOT NULL,
 PRIMARY KEY (id)
 );
 
@@ -25,15 +25,15 @@ PRIMARY KEY (id)
 
 CREATE TABLE especie (
 id INT AUTO_INCREMENT,
-nombre_especie VARCHAR (30) NOT NULL,
-nombre_comun VARCHAR (30) NULL,
-nombre_ingles VARCHAR (30) NULL,
+nombre_especie VARCHAR (255) NOT NULL,
+nombre_comun VARCHAR (255) NULL,
+nombre_ingles VARCHAR (255) NULL,
 PRIMARY KEY (id)
 );
 
 CREATE TABLE metal (
 id INT AUTO_INCREMENT,
-nombre VARCHAR(50) NOT NULL,
+nombre VARCHAR(255) NOT NULL,
 PRIMARY KEY (id)
 );
 
